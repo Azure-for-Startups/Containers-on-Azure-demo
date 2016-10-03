@@ -22,7 +22,7 @@ This demo scenario assumes the existence of a running service performing a heavy
 
 -   The interaction between different components at a high level is displayed in the following sequence diagram:
 
-<img src="media/Image1.png" width="410" height="285" />
+<img src="media/image1.png" width="410" height="285" />
 
 -   The web site interface is fairly simple:
 
