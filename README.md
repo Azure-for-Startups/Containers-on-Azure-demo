@@ -6,13 +6,13 @@ This sample covers a typical flow to perform heavy computational tasks (for exam
 
 This demo scenario assumes the existence of a running service performing a heavy computational task (for example, video, audio encoding, hash calculation, or data encryption etc.). In this sample we use Azure blob storage to store input and output data. We emulate heavy calculation by using a standard method from the Linux world: dd if=/dev/zero of=/dev/null. For about 20% of the tasks we emulate error and for the remaining 80% we copy information from the source blob to the target blob. In order to make this process scalable and cost effective, the processing is encapsulated in Docker containers which are dynamically allocated if the service load grows and deallocated once resource demand goes down.
 
-#Components
+####Components
 
 -   Worker Docker container performing heavy computational tasks
 
 -   Node.JS based website handling requests, showing completed tasks and initiating processing
 
-#Flow
+####Flow
 
 -   The web site accepts the URL to the source blob and once the task has been completed it provides a temporary URL to download the results.
 
@@ -26,7 +26,7 @@ This demo scenario assumes the existence of a running service performing a heavy
 
 The interface shows the user the list of tasks, status of each task, and allows the user to download task results for completed tasks. To simplify the sample, we are not using any database backend and will be using Azure Storage Blob naming convention to save data.
 
-##PREREQUISITES
+####PREREQUISITES
 
 -   An Azure subscription
 
@@ -38,13 +38,13 @@ The interface shows the user the list of tasks, status of each task, and allows 
 
 -   Optional: An existing SSH RSA Key if available. If not, follow the instructions in the document to create one.
 
-##DURATION
+####DURATION
 
 This tutorial / guide can typically be completed within 60-90 minutes.
 
 ##CREATING AN ENVIRONMENT
 
-#Generate certificates
+###Generate certificates
 
 When creating container services, SSH RSA key is required for access. In order to get a quick start, pre-generated sample keys are provided in the *DockerizedEncoder/Keys* subfolder. **NOTE: Do not use these keys on a production system!**
 
@@ -58,7 +58,7 @@ The following articles describe in detail how to create SSH RSA Key in a specifi
 
 For more detailed information, please visit the article: <https://github.com/Azure/azure-quickstart-templates/blob/master/101-acs-mesos/docs/SSHKeyManagement.md#ssh-key-generation>
 
-#Deploy an Azure Container Service Cluster
+###Deploy an Azure Container Service Cluster
 
 We will provide steps you need to perform to deploy Azure Container service cluster. Detailed documentation is also available here: <https://azure.microsoft.com/en-us/documentation/articles/container-service-deployment>
 
@@ -102,7 +102,7 @@ Setup a target storage container
 
 At this point we have a fully functional docker swarm which is running on a single VM instance. This topology will allow us to spin up as many docker instances as the resources of the VM can handle. Now, in order to scale beyond the limit of a single VM, we will configure auto-scaling.
 
-#Enable Azure Container Service cluster auto scale
+###Enable Azure Container Service cluster auto scale
 
 There are two documents publically available which describe this concept:
 
@@ -148,272 +148,139 @@ or Azure PowerShell command:
 
 -   Press on Edit Template and paste the template content:
 
-> *{*
->
-> *"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json\#",*
->
-> *"contentVersion": "1.0.0.0",*
->
-> *"parameters": {*
->
-> *"vmssName": {*
->
-> *"type": "string",*
->
-> *"metadata": {*
->
-> *"description": "Name of existing VM Scale Set"*
->
-> *}*
->
-> *},*
->
-> *"storageAccountName": {*
->
-> *"type": "string",*
->
-> *"metadata": {*
->
-> *"description": "Diagnostics storage account name"*
->
-> *}*
->
-> *}*
->
-> *},*
->
-> *"variables": {*
->
-> *"apiVersion": "2015-06-15",*
->
-> *"diagnosticsStorageAccountName": "\[parameters('storageAccountName')\]",*
->
-> *"diagnosticsStorageAccountResourceGroup": "\[resourceGroup().name\]",*
->
-> *"accountid": "\[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',variables('diagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))\]",*
->
-> *"wadlogs": "&lt;WadCfg&gt;&lt;DiagnosticMonitorConfiguration&gt;",*
->
-> *"wadperfcounters1": "&lt;PerformanceCounters scheduledTransferPeriod=\\"PT1M\\"&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Memory\\\\AvailableMemory\\" sampleRate=\\"PT15S\\" unit=\\"Bytes\\"&gt;&lt;annotation displayName=\\"Memory available\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Memory\\\\PercentAvailableMemory\\" sampleRate=\\"PT15S\\" unit=\\"Percent\\"&gt;&lt;annotation displayName=\\"Mem. percent available\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Memory\\\\UsedMemory\\" sampleRate=\\"PT15S\\" unit=\\"Bytes\\"&gt;&lt;annotation displayName=\\"Memory used\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Memory\\\\PercentUsedMemory\\" sampleRate=\\"PT15S\\" unit=\\"Percent\\"&gt;&lt;annotation displayName=\\"Memory percentage\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Memory\\\\PercentUsedByCache\\" sampleRate=\\"PT15S\\" unit=\\"Percent\\"&gt;&lt;annotation displayName=\\"Mem. used by cache\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Processor\\\\PercentIdleTime\\" sampleRate=\\"PT15S\\" unit=\\"Percent\\"&gt;&lt;annotation displayName=\\"CPU idle time\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Processor\\\\PercentUserTime\\" sampleRate=\\"PT15S\\" unit=\\"Percent\\"&gt;&lt;annotation displayName=\\"CPU user time\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Processor\\\\PercentProcessorTime\\" sampleRate=\\"PT15S\\" unit=\\"Percent\\"&gt;&lt;annotation displayName=\\"CPU percentage guest OS\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\Processor\\\\PercentIOWaitTime\\" sampleRate=\\"PT15S\\" unit=\\"Percent\\"&gt;&lt;annotation displayName=\\"CPU IO wait time\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;",*
->
-> *"wadperfcounters2": "&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\BytesPerSecond\\" sampleRate=\\"PT15S\\" unit=\\"BytesPerSecond\\"&gt;&lt;annotation displayName=\\"Disk total bytes\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\ReadBytesPerSecond\\" sampleRate=\\"PT15S\\" unit=\\"BytesPerSecond\\"&gt;&lt;annotation displayName=\\"Disk read guest OS\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\WriteBytesPerSecond\\" sampleRate=\\"PT15S\\" unit=\\"BytesPerSecond\\"&gt;&lt;annotation displayName=\\"Disk write guest OS\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\TransfersPerSecond\\" sampleRate=\\"PT15S\\" unit=\\"CountPerSecond\\"&gt;&lt;annotation displayName=\\"Disk transfers\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\ReadsPerSecond\\" sampleRate=\\"PT15S\\" unit=\\"CountPerSecond\\"&gt;&lt;annotation displayName=\\"Disk reads\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\WritesPerSecond\\" sampleRate=\\"PT15S\\" unit=\\"CountPerSecond\\"&gt;&lt;annotation displayName=\\"Disk writes\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\AverageReadTime\\" sampleRate=\\"PT15S\\" unit=\\"Seconds\\"&gt;&lt;annotation displayName=\\"Disk read time\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\AverageWriteTime\\" sampleRate=\\"PT15S\\" unit=\\"Seconds\\"&gt;&lt;annotation displayName=\\"Disk write time\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\AverageTransferTime\\" sampleRate=\\"PT15S\\" unit=\\"Seconds\\"&gt;&lt;annotation displayName=\\"Disk transfer time\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;PerformanceCounterConfiguration counterSpecifier=\\"\\\\PhysicalDisk\\\\AverageDiskQueueLength\\" sampleRate=\\"PT15S\\" unit=\\"Count\\"&gt;&lt;annotation displayName=\\"Disk queue length\\" locale=\\"en-us\\"/&gt;&lt;/PerformanceCounterConfiguration&gt;&lt;/PerformanceCounters&gt;",*
->
-> *"wadcfgxstart": "\[concat(variables('wadlogs'),variables('wadperfcounters1'),variables('wadperfcounters2'),'&lt;Metrics resourceId=\\"')\]",*
->
-> *"wadmetricsresourceid": "\[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'))\]",*
->
-> *"wadcfgxend": "\[concat('\\"&gt;&lt;MetricAggregation scheduledTransferPeriod=\\"PT1H\\"/&gt;&lt;MetricAggregation scheduledTransferPeriod=\\"PT1M\\"/&gt;&lt;/Metrics&gt;&lt;/DiagnosticMonitorConfiguration&gt;&lt;/WadCfg&gt;')\]"*
->
-> *},*
->
-> *"resources": \[*
->
-> *{*
->
-> *"type": "Microsoft.Compute/virtualMachineScaleSets",*
->
-> *"apiVersion": "\[variables('apiVersion')\]",*
->
-> *"name": "\[parameters('vmssName')\]",*
->
-> *"location": "\[resourceGroup().location\]",*
->
-> *"properties": {*
->
-> *"upgradePolicy": {*
->
-> *"mode": "Automatic"*
->
-> *},*
->
-> *"virtualMachineProfile": {*
->
-> *"extensionProfile": {*
->
-> *"extensions": \[*
->
-> *{*
->
-> *"name": "LinuxDiagnostic",*
->
-> *"properties": {*
->
-> *"publisher": "Microsoft.OSTCExtensions",*
->
-> *"type": "LinuxDiagnostic",*
->
-> *"typeHandlerVersion": "2.2",*
->
-> *"autoUpgradeMinorVersion": true,*
->
-> *"settings": {*
->
-> *"xmlCfg": "\[base64(concat(variables('wadcfgxstart'),variables('wadmetricsresourceid'),variables('wadcfgxend')))\]",*
->
-> *"storageAccount": "\[variables('diagnosticsStorageAccountName')\]"*
->
-> *},*
->
-> *"protectedSettings": {*
->
-> *"storageAccountName": "\[variables('diagnosticsStorageAccountName')\]",*
->
-> *"storageAccountKey": "\[listkeys(variables('accountid'), variables('apiVersion')).key1\]",*
->
-> *"storageAccountEndPoint": "https://core.windows.net"*
->
-> *}*
->
-> *}*
->
-> *}*
->
-> *\]*
->
-> *}*
->
-> *}*
->
-> *}*
->
-> *},*
->
-> *{*
->
-> *"type": "Microsoft.Insights/autoscaleSettings",*
->
-> *"apiVersion": "2015-04-01",*
->
-> *"name": "\[concat(parameters('vmssName'),'autoscale')\]",*
->
-> *"location": "\[resourceGroup().location\]",*
->
-> *"dependsOn": \[*
->
-> *"\[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))\]"*
->
-> *\],*
->
-> *"properties": {*
->
-> *"name": "\[concat(parameters('vmssName'),'autoscale')\]",*
->
-> *"targetResourceUri": "\[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))\]",*
->
-> *"enabled": true,*
->
-> *"profiles": \[*
->
-> *{*
->
-> *"name": "Profile1",*
->
-> *"capacity": {*
->
-> *"minimum": "1",*
->
-> *"maximum": "10",*
->
-> *"default": "1"*
->
-> *},*
->
-> *"rules": \[*
->
-> *{*
->
-> *"metricTrigger": {*
->
-> *"metricName": "\\\\Processor\\\\PercentProcessorTime",*
->
-> *"metricNamespace": "",*
->
-> *"metricResourceUri": "\[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))\]",*
->
-> *"timeGrain": "PT1M",*
->
-> *"statistic": "Average",*
->
-> *"timeWindow": "PT5M",*
->
-> *"timeAggregation": "Average",*
->
-> *"operator": "GreaterThan",*
->
-> *"threshold": 60.0*
->
-> *},*
->
-> *"scaleAction": {*
->
-> *"direction": "Increase",*
->
-> *"type": "ChangeCount",*
->
-> *"value": "1",*
->
-> *"cooldown": "PT10M"*
->
-> *}*
->
-> *},*
->
-> *{*
->
-> *"metricTrigger": {*
->
-> *"metricName": "\\\\Processor\\\\PercentProcessorTime",*
->
-> *"metricNamespace": "",*
->
-> *"metricResourceUri": "\[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))\]",*
->
-> *"timeGrain": "PT1M",*
->
-> *"statistic": "Average",*
->
-> *"timeWindow": "PT5M",*
->
-> *"timeAggregation": "Average",*
->
-> *"operator": "LessThan",*
->
-> *"threshold": 40.0*
->
-> *},*
->
-> *"scaleAction": {*
->
-> *"direction": "Decrease",*
->
-> *"type": "ChangeCount",*
->
-> *"value": "1",*
->
-> *"cooldown": "PT10M"*
->
-> *}*
->
-> *}*
->
-> *\]*
->
-> *}*
->
-> *\]*
->
-> *}*
->
-> *}*
->
-> *\],*
->
-> *"outputs": {*
->
-> *}*
->
-> *}
-> *
+  {
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+      "vmssName": {
+        "type": "string",
+        "metadata": {
+          "description": "Name of existing VM Scale Set"
+        }
+      },
+      "storageAccountName": {
+        "type": "string",
+        "metadata": {
+          "description": "Diagnostics storage account name"
+        }
+      }
+    },
+    "variables": {
+      "apiVersion": "2015-06-15",
+      "diagnosticsStorageAccountName": "[parameters('storageAccountName')]",
+      "diagnosticsStorageAccountResourceGroup": "[resourceGroup().name]",
+      "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',variables('diagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",
+      "wadlogs": "<WadCfg><DiagnosticMonitorConfiguration>",
+      "wadperfcounters1": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\AvailableMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentAvailableMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. percent available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\UsedMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory used\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory percentage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedByCache\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. used by cache\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIdleTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU idle time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentUserTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentProcessorTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU percentage guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIOWaitTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU IO wait time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
+      "wadperfcounters2": "<PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\BytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk total bytes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk read guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WriteBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk write guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\TransfersPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk transfers\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadsPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk reads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WritesPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk writes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageReadTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk read time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageWriteTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk write time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageTransferTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk transfer time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageDiskQueueLength\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Disk queue length\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
+      "wadcfgxstart": "[concat(variables('wadlogs'),variables('wadperfcounters1'),variables('wadperfcounters2'),'<Metrics resourceId=\"')]",
+      "wadmetricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'))]",
+      "wadcfgxend": "[concat('\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]"
+    },
+    "resources": [
+      {
+        "type": "Microsoft.Compute/virtualMachineScaleSets",
+        "apiVersion": "[variables('apiVersion')]",
+        "name": "[parameters('vmssName')]",
+        "location": "[resourceGroup().location]",
+        "properties": {
+          "upgradePolicy": {
+            "mode": "Automatic"
+          },
+          "virtualMachineProfile": {
+            "extensionProfile": {
+              "extensions": [
+                {
+                  "name": "LinuxDiagnostic",
+                  "properties": {
+                    "publisher": "Microsoft.OSTCExtensions",
+                    "type": "LinuxDiagnostic",
+                    "typeHandlerVersion": "2.2",
+                    "autoUpgradeMinorVersion": true,
+                    "settings": {
+                      "xmlCfg": "[base64(concat(variables('wadcfgxstart'),variables('wadmetricsresourceid'),variables('wadcfgxend')))]",
+                      "storageAccount": "[variables('diagnosticsStorageAccountName')]"
+                    },
+                    "protectedSettings": {
+                      "storageAccountName": "[variables('diagnosticsStorageAccountName')]",
+                      "storageAccountKey": "[listkeys(variables('accountid'), variables('apiVersion')).key1]",
+                      "storageAccountEndPoint": "https://core.windows.net"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      {
+        "type": "Microsoft.Insights/autoscaleSettings",
+        "apiVersion": "2015-04-01",
+        "name": "[concat(parameters('vmssName'),'autoscale')]",
+        "location": "[resourceGroup().location]",
+        "dependsOn": [
+          "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
+        ],
+        "properties": {
+          "name": "[concat(parameters('vmssName'),'autoscale')]",
+          "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+          "enabled": true,
+          "profiles": [
+            {
+              "name": "Profile1",
+              "capacity": {
+                "minimum": "1",
+                "maximum": "10",
+                "default": "1"
+              },
+              "rules": [
+                {
+                  "metricTrigger": {
+                    "metricName": "\\Processor\\PercentProcessorTime",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT5M",
+                    "timeAggregation": "Average",
+                    "operator": "GreaterThan",
+                    "threshold": 60.0
+                  },
+                  "scaleAction": {
+                    "direction": "Increase",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                },
+                {
+                  "metricTrigger": {
+                    "metricName": "\\Processor\\PercentProcessorTime",
+                    "metricNamespace": "",
+                    "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+                    "timeGrain": "PT1M",
+                    "statistic": "Average",
+                    "timeWindow": "PT5M",
+                    "timeAggregation": "Average",
+                    "operator": "LessThan",
+                    "threshold": 40.0
+                  },
+                  "scaleAction": {
+                    "direction": "Decrease",
+                    "type": "ChangeCount",
+                    "value": "1",
+                    "cooldown": "PT10M"
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    "outputs": {
+    }
+  }
 
 -   Press on Save
 
@@ -433,7 +300,7 @@ or Azure PowerShell command:
 
 > <img src="media/image20.png" width="326" height="201" />
 
-#Connect to cluster master VM
+###Connect to cluster master VM
 
 Based on *<https://azure.microsoft.com/en-us/documentation/articles/container-service-connect/> *
 
@@ -457,7 +324,7 @@ The ssh endpoint of cluster master VM is \[USERNAME\]@\[DNSPREFIX\]mgmt.\[REGION
 >
 > *docker -H tcp://0.0.0.0:2375 run -i microsoft/azure-cli /bin/echo 'Hello world'*
 
-#Create a new docker image
+###Create a new docker image
 
 We will create an image for our dockerized encoder from scratch. This image will be a dummy encoder. It downloads a file, makes a high CPU load for 1 processor core for 120 seconds and then copies the file to storage or creates an error (tuned to be in 20% of runs). Also the script removes expired results. This is not a production script sample. Be sure you have an active account on the docker hub. Read more details and signup here: <https://www.docker.com/products/docker-hub>. In order to avoid local docker installation I propose to use the master virtual machine of cluster just created.
 
@@ -465,189 +332,131 @@ We will create an image for our dockerized encoder from scratch. This image will
 
 -   Type commands:
 
-> *cd*
->
-> *mkdir dockerizedencoder*
->
-> *cd dockerizedencoder*
->
-> *vi Dockerfile*
+        cd
+        mkdir dockerizedencoder
+        cd dockerizedencoder
+        vi Dockerfile
+
 
 -   Press Insert and paste the following content:
 
-> *FROM microsoft/azure-cli*
->
-> *RUN apt-get update && apt-get install -y \\*
->
-> *uuid \\*
->
-> *wget \\*
->
-> *&& rm -rf /var/lib/apt/lists/\**
->
-> *COPY ./docker-entrypoint.sh /*
->
-> *RUN chmod +x /docker-entrypoint.sh*
->
-> *ENTRYPOINT \["/docker-entrypoint.sh"\]*
+        FROM microsoft/azure-cli
+
+        RUN apt-get update && apt-get install -y \
+            uuid \
+            wget \
+         && rm -rf /var/lib/apt/lists/*
+
+        COPY ./docker-entrypoint.sh /
+        RUN chmod +x /docker-entrypoint.sh
+
+        ENTRYPOINT ["/docker-entrypoint.sh"]
+
 
 -   Save file, press Esc, Shift + ‘:’, type wq and press Enter)
 
 -   Type a command:
 
-> *vi docker-entrypoint.sh*
+        vi docker-entrypoint.sh
 
 -   Press Insert and paste a content:
 
-> *\#!/bin/bash*
->
-> *if \[ "$5" = '' \]; then*
->
-> *echo "Usage:"*
->
-> *echo " $0 SourceUrl StorageAccount StorageKey ContainerName TargetGUID ExpirationEpoch"*
->
-> *echo " SourceUrl: URI from the source file will be downloaded"*
->
-> *echo " StorageAccount: storage account name to store a results"*
->
-> *echo " StorageKey: storage account access key"*
->
-> *echo " ContainerName: blob container name"*
->
-> *echo " TargetGUID: alphanumeric unique id of target"*
->
-> *echo " ExpirationEpoch: result file expiration at given seconds since epoch UTC"*
->
-> *exit 1*
->
-> *fi*
->
-> *SourceUrl=$1*
->
-> *export AZURE\_STORAGE\_ACCOUNT=$2*
->
-> *export AZURE\_STORAGE\_ACCESS\_KEY=$3*
->
-> *export ContainerName=$4*
->
-> *TargetGUID=$5*
->
-> *Expiration=$6*
->
-> *IntermediateName=${TargetGUID}\_Intermediate\_${Expiration}*
->
-> *TargetName=${TargetGUID}\_Success\_${Expiration}*
->
-> *ErrorName=${TargetGUID}\_Error\_${Expiration}*
->
-> *SourceFile=/tmp/\`basename $SourceUrl\`*
->
-> *Zero=/tmp/zero*
->
-> *&gt;$Zero*
->
-> *function cecho()*
->
-> *{*
->
-> *echo -e "\\x1B\[32m$@\\x1B\[0m"*
->
-> *}*
->
-> *function result()*
->
-> *{*
->
-> *if \[ $1 \]; then*
->
-> *cecho Uloading an Error file ...*
->
-> *azure storage blob upload $Zero "$ContainerName" "$ErrorName"*
->
-> *else*
->
-> *cecho Uploading a Success file ...*
->
-> *azure storage blob upload "$SourceFile" "$ContainerName" "$TargetName"*
->
-> *fi*
->
-> *cecho Deleting intermediate state marker file...*
->
-> *azure storage blob delete "$ContainerName" "$IntermediateName"*
->
-> *cecho Finished*
->
-> *exit 0*
->
-> *}*
->
-> *cecho Writing intermediate state marker file...*
->
-> *azure storage blob upload $Zero "$ContainerName" "$IntermediateName"*
->
-> *if \[ $? -ne 0 \]; then*
->
-> *echo -e "\\x1B\[31mContainer access error. Terminated.\\x1B\[0m"*
->
-> *exit 1*
->
-> *fi*
->
-> *cecho Removing expired files...*
->
-> *export Now=\`date +%s\`*
->
-> *azure storage blob list "$ContainerName" --json | awk ' /'name'/ {print $2}' | sed -e "s/\[\\",\]//g" | awk -F "\_" ' { if ($3 &lt; ENVIRON\["Now"\]) { print "azure storage blob delete " ENVIRON\["ContainerName"\] " " $0 } } ' &gt; /tmp/deleteExpired.sh*
->
-> *bash /tmp/deleteExpired.sh*
->
-> *cecho Downloading source file...*
->
-> *rm $SourceFile &&gt; /dev/null*
->
-> *wget $SourceUrl -O $SourceFile*
->
-> *if \[ $? -ne 0 \]; then*
->
-> *echo -e "\\x1B\[31mSource file download error\\x1B\[0m"*
->
-> *result 1*
->
-> *fi*
->
-> *cecho Dummy encoding with heavy CPU load for 120+ seconds...*
->
-> *End=$((SECONDS+120))*
->
-> *while \[ $SECONDS -lt $End \]; do*
->
-> *dd if=/dev/zero of=/dev/null bs=1K count=10M &&gt; /dev/null*
->
-> *done*
->
-> *cecho This is as designed: 20% of runs will produce an error result*
->
-> *result "$(((RANDOM % 100)+1)) -lt 20"*
+        #!/bin/bash
+
+        if [ "$5" = '' ]; then
+            echo "Usage:"
+            echo " $0 SourceUrl StorageAccount StorageKey ContainerName TargetGUID ExpirationEpoch"
+            echo "    SourceUrl: URI from the source file will be downloaded"
+            echo "    StorageAccount: storage account name to store a results"
+            echo "    StorageKey: storage account access key"
+            echo "    ContainerName: blob container name"
+            echo "    TargetGUID: alphanumeric unique id of target"
+            echo "    ExpirationEpoch: result file expiration at given seconds since epoch UTC"
+            exit 1
+        fi
+
+        SourceUrl=$1
+        export AZURE_STORAGE_ACCOUNT=$2
+        export AZURE_STORAGE_ACCESS_KEY=$3
+        export ContainerName=$4
+        TargetGUID=$5
+        Expiration=$6
+
+        IntermediateName=${TargetGUID}_Intermediate_${Expiration}
+        TargetName=${TargetGUID}_Success_${Expiration}
+        ErrorName=${TargetGUID}_Error_${Expiration}
+        SourceFile=/tmp/`basename $SourceUrl`
+        Zero=/tmp/zero
+        >$Zero
+
+        function cecho()
+        {
+            echo -e "\x1B[32m$@\x1B[0m"
+        }
+
+        function result()
+        {
+            if [ $1 ]; then
+                cecho Uloading an Error file ...
+                azure storage blob upload $Zero "$ContainerName" "$ErrorName"
+            else
+                cecho Uploading a Success file ...
+                azure storage blob upload "$SourceFile" "$ContainerName" "$TargetName"
+            fi
+
+            cecho Deleting intermediate state marker file...
+            azure storage blob delete "$ContainerName" "$IntermediateName"
+
+            cecho Finished
+            exit 0
+        }
+
+        cecho Writing intermediate state marker file...
+        azure storage blob upload $Zero "$ContainerName" "$IntermediateName"
+        if [ $? -ne 0 ]; then
+            echo -e "\x1B[31mContainer access error. Terminated.\x1B[0m"
+            exit 1
+        fi
+
+        cecho Removing expired files...
+        export Now=`date +%s`
+        azure storage blob list "$ContainerName" --json | awk ' /'name'/ {print $2}' | sed -e "s/[\",]//g" | awk -F "_" ' { if ($3 < ENVIRON["Now"]) { print "azure storage blob delete " ENVIRON["ContainerName"] " " $0 } } ' > /tmp/deleteExpired.sh
+        bash /tmp/deleteExpired.sh
+
+        cecho Downloading source file...
+        rm $SourceFile &> /dev/null
+        wget $SourceUrl -O $SourceFile
+        if [ $? -ne 0 ]; then
+            echo -e "\x1B[31mSource file download error\x1B[0m"
+            result 1
+        fi
+
+        cecho Dummy encoding with heavy CPU load for 120+ seconds...
+        End=$((SECONDS+120))
+        while [ $SECONDS -lt $End ]; do
+            dd if=/dev/zero of=/dev/null bs=1K count=10M &> /dev/null
+        done
+
+        cecho This is as designed: 20% of runs will produce an error result
+        result "$(((RANDOM % 100)+1)) -lt 20"
 
 -   Save file
 
 -   Type command:
 
-> *docker login*
+        docker login
 
 -   Enter your credentials for docker hub
 
 -   In order to publish a new image in the docker hub we need a unique name for image. Let us use a YourDockerHubLogin/dockerizedencoder as the name. Do not forget to replace YourDockerHubLogin with your docker hub login for this and subsequent commands. Type command:
 
-> *docker build -t* <span id="OLE_LINK24" class="anchor"><span id="OLE_LINK25" class="anchor"><span id="OLE_LINK26" class="anchor"></span></span></span>*YourDockerHubLogin/dockerizedencoder ./*
+        docker build -t YourDockerHubLogin/dockerizedencoder ./
 
 Push docker image
 
 -   Type command:
 
-> *docker push YourDockerHubLogin/dockerizedencoder*
+        docker push YourDockerHubLogin/dockerizedencoder
 
 Test run of docker image
 
@@ -655,19 +464,19 @@ Let us run an image we just created.
 
 -   Pull the latest version for the start:
 
-> *docker -H tcp://0.0.0.0:2375 pull YourDockerHubLogin/dockerizedencoder*
+        docker -H tcp://0.0.0.0:2375 pull YourDockerHubLogin/dockerizedencoder
 
 We need to provide a set of parameters for the image run.
 
 -   Run an image without parameters to see usage:
 
-> *docker -H tcp://0.0.0.0:2375 run -i YourDockerHubLogin/dockerizedencoder*
->
-> <img src="media/image23.png" width="601" height="92" />
+        docker -H tcp://0.0.0.0:2375 run -i YourDockerHubLogin/dockerizedencoder
+
+        <img src="media/image23.png" width="601" height="92" />
 
 -   Run with required parameters. We used an Azure Sign up video URL actual, at the time this article was written, so feel free to use some other resource. Replace YourStorageAccount and YourStorageKey with the storage account name and key that we copied after storage account creation later
 
-> docker -H tcp://0.0.0.0:2375 run -i YourDockerHubLogin/dockerizedencoder <https://sec.ch9.ms/ch9/2286/4c62ace4-29b9-487d-8a2f-8cedb1902286/SignUpForMicrosoftAzure_mid.mp4> <span id="OLE_LINK27" class="anchor"><span id="OLE_LINK28" class="anchor"></span></span>YourStorageAccount YourStorageKey encoderresults MANUALRUN \`date +%s --date='next day'\`
+        docker -H tcp://0.0.0.0:2375 run -i YourDockerHubLogin/dockerizedencoder https://sec.ch9.ms/ch9/2286/4c62ace4-29b9-487d-8a2f-8cedb1902286/SignUpForMicrosoftAzure_mid.mp4 YourStorageAccount YourStorageKey encoderresults MANUALRUN `date +%s --date='next day'`
 
 If you try several times you will get both success and error results. The running docker script is designed to produce approximately 20% of runs with an error result. Please ensure you see result file(s) in the encoderresults container like this:
 
@@ -981,7 +790,7 @@ and the following code after creation app:
 
 > <img src="media/image25.png" width="247" height="239" />
 
-#Deploy Node.JS as Azure Web App
+###Deploy Node.JS as Azure Web App
 
 1.  Create a Wep App in Azure. Go to <https://portal.azure.com/>, click on "+New", select "Web + Mobile" and then "Web App":
 
