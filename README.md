@@ -118,11 +118,13 @@ In the sample we will use CPU load as an auto scale decision maker, and it is po
 
 The Virtual Machine Scale Sets API version is 2015-06-15 and it is a preview release for evaluation and testing purposes at the moment the article is being written. It is recommended that for the preview release, you register with the feature before using VM Scale Sets. You do this by running the following Azure-Cli command:
 
-<span id="OLE_LINK17" class="anchor"><span id="OLE_LINK18" class="anchor"></span></span>*azure feature register Microsoft.Compute vmssApiPreviewV2Access*
+<span id="OLE_LINK17" class="anchor"><span id="OLE_LINK18" class="anchor"></span></span>
+
+     azure feature register Microsoft.Compute vmssApiPreviewV2Access
 
 or Azure PowerShell command:
 
-*Register-AzureRmProviderFeature -FeatureName vmssApiPreviewV2Access -ProviderNamespace Microsoft.Compute*
+     Register-AzureRmProviderFeature -FeatureName vmssApiPreviewV2Access -ProviderNamespace Microsoft.Compute
 
 <span id="OLE_LINK22" class="anchor"><span id="OLE_LINK23" class="anchor"></span></span>In order to enable automatic scale, we need a name for Virtual Machine Scale Set that the deployed cluster uses. We will use this name in the template deployment later. Please write the name down for future use.
 
@@ -152,139 +154,139 @@ or Azure PowerShell command:
 
 -   Press on Edit Template and paste the template content:
 
-  {
-    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-    "contentVersion": "1.0.0.0",
-    "parameters": {
-      "vmssName": {
-        "type": "string",
-        "metadata": {
-          "description": "Name of existing VM Scale Set"
-        }
-      },
-      "storageAccountName": {
-        "type": "string",
-        "metadata": {
-          "description": "Diagnostics storage account name"
-        }
-      }
-    },
-    "variables": {
-      "apiVersion": "2015-06-15",
-      "diagnosticsStorageAccountName": "[parameters('storageAccountName')]",
-      "diagnosticsStorageAccountResourceGroup": "[resourceGroup().name]",
-      "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',variables('diagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",
-      "wadlogs": "<WadCfg><DiagnosticMonitorConfiguration>",
-      "wadperfcounters1": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\AvailableMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentAvailableMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. percent available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\UsedMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory used\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory percentage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedByCache\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. used by cache\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIdleTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU idle time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentUserTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentProcessorTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU percentage guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIOWaitTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU IO wait time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
-      "wadperfcounters2": "<PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\BytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk total bytes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk read guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WriteBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk write guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\TransfersPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk transfers\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadsPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk reads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WritesPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk writes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageReadTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk read time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageWriteTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk write time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageTransferTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk transfer time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageDiskQueueLength\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Disk queue length\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
-      "wadcfgxstart": "[concat(variables('wadlogs'),variables('wadperfcounters1'),variables('wadperfcounters2'),'<Metrics resourceId=\"')]",
-      "wadmetricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'))]",
-      "wadcfgxend": "[concat('\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]"
-    },
-    "resources": [
-      {
-        "type": "Microsoft.Compute/virtualMachineScaleSets",
-        "apiVersion": "[variables('apiVersion')]",
-        "name": "[parameters('vmssName')]",
-        "location": "[resourceGroup().location]",
-        "properties": {
-          "upgradePolicy": {
-            "mode": "Automatic"
+        {
+          "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "parameters": {
+            "vmssName": {
+              "type": "string",
+              "metadata": {
+                "description": "Name of existing VM Scale Set"
+              }
+            },
+            "storageAccountName": {
+              "type": "string",
+              "metadata": {
+                "description": "Diagnostics storage account name"
+              }
+            }
           },
-          "virtualMachineProfile": {
-            "extensionProfile": {
-              "extensions": [
-                {
-                  "name": "LinuxDiagnostic",
-                  "properties": {
-                    "publisher": "Microsoft.OSTCExtensions",
-                    "type": "LinuxDiagnostic",
-                    "typeHandlerVersion": "2.2",
-                    "autoUpgradeMinorVersion": true,
-                    "settings": {
-                      "xmlCfg": "[base64(concat(variables('wadcfgxstart'),variables('wadmetricsresourceid'),variables('wadcfgxend')))]",
-                      "storageAccount": "[variables('diagnosticsStorageAccountName')]"
-                    },
-                    "protectedSettings": {
-                      "storageAccountName": "[variables('diagnosticsStorageAccountName')]",
-                      "storageAccountKey": "[listkeys(variables('accountid'), variables('apiVersion')).key1]",
-                      "storageAccountEndPoint": "https://core.windows.net"
-                    }
+          "variables": {
+            "apiVersion": "2015-06-15",
+            "diagnosticsStorageAccountName": "[parameters('storageAccountName')]",
+            "diagnosticsStorageAccountResourceGroup": "[resourceGroup().name]",
+            "accountid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',variables('diagnosticsStorageAccountResourceGroup'),'/providers/','Microsoft.Storage/storageAccounts/', variables('diagnosticsStorageAccountName'))]",
+            "wadlogs": "<WadCfg><DiagnosticMonitorConfiguration>",
+            "wadperfcounters1": "<PerformanceCounters scheduledTransferPeriod=\"PT1M\"><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\AvailableMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentAvailableMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. percent available\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\UsedMemory\" sampleRate=\"PT15S\" unit=\"Bytes\"><annotation displayName=\"Memory used\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedMemory\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Memory percentage\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Memory\\PercentUsedByCache\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"Mem. used by cache\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIdleTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU idle time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentUserTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU user time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentProcessorTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU percentage guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\Processor\\PercentIOWaitTime\" sampleRate=\"PT15S\" unit=\"Percent\"><annotation displayName=\"CPU IO wait time\" locale=\"en-us\"/></PerformanceCounterConfiguration>",
+            "wadperfcounters2": "<PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\BytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk total bytes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk read guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WriteBytesPerSecond\" sampleRate=\"PT15S\" unit=\"BytesPerSecond\"><annotation displayName=\"Disk write guest OS\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\TransfersPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk transfers\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\ReadsPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk reads\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\WritesPerSecond\" sampleRate=\"PT15S\" unit=\"CountPerSecond\"><annotation displayName=\"Disk writes\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageReadTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk read time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageWriteTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk write time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageTransferTime\" sampleRate=\"PT15S\" unit=\"Seconds\"><annotation displayName=\"Disk transfer time\" locale=\"en-us\"/></PerformanceCounterConfiguration><PerformanceCounterConfiguration counterSpecifier=\"\\PhysicalDisk\\AverageDiskQueueLength\" sampleRate=\"PT15S\" unit=\"Count\"><annotation displayName=\"Disk queue length\" locale=\"en-us\"/></PerformanceCounterConfiguration></PerformanceCounters>",
+            "wadcfgxstart": "[concat(variables('wadlogs'),variables('wadperfcounters1'),variables('wadperfcounters2'),'<Metrics resourceId=\"')]",
+            "wadmetricsresourceid": "[concat('/subscriptions/',subscription().subscriptionId,'/resourceGroups/',resourceGroup().name ,'/providers/','Microsoft.Compute/virtualMachineScaleSets/',parameters('vmssName'))]",
+            "wadcfgxend": "[concat('\"><MetricAggregation scheduledTransferPeriod=\"PT1H\"/><MetricAggregation scheduledTransferPeriod=\"PT1M\"/></Metrics></DiagnosticMonitorConfiguration></WadCfg>')]"
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Compute/virtualMachineScaleSets",
+              "apiVersion": "[variables('apiVersion')]",
+              "name": "[parameters('vmssName')]",
+              "location": "[resourceGroup().location]",
+              "properties": {
+                "upgradePolicy": {
+                  "mode": "Automatic"
+                },
+                "virtualMachineProfile": {
+                  "extensionProfile": {
+                    "extensions": [
+                      {
+                        "name": "LinuxDiagnostic",
+                        "properties": {
+                          "publisher": "Microsoft.OSTCExtensions",
+                          "type": "LinuxDiagnostic",
+                          "typeHandlerVersion": "2.2",
+                          "autoUpgradeMinorVersion": true,
+                          "settings": {
+                            "xmlCfg": "[base64(concat(variables('wadcfgxstart'),variables('wadmetricsresourceid'),variables('wadcfgxend')))]",
+                            "storageAccount": "[variables('diagnosticsStorageAccountName')]"
+                          },
+                          "protectedSettings": {
+                            "storageAccountName": "[variables('diagnosticsStorageAccountName')]",
+                            "storageAccountKey": "[listkeys(variables('accountid'), variables('apiVersion')).key1]",
+                            "storageAccountEndPoint": "https://core.windows.net"
+                          }
+                        }
+                      }
+                    ]
                   }
                 }
-              ]
+              }
+            },
+            {
+              "type": "Microsoft.Insights/autoscaleSettings",
+              "apiVersion": "2015-04-01",
+              "name": "[concat(parameters('vmssName'),'autoscale')]",
+              "location": "[resourceGroup().location]",
+              "dependsOn": [
+                "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
+              ],
+              "properties": {
+                "name": "[concat(parameters('vmssName'),'autoscale')]",
+                "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+                "enabled": true,
+                "profiles": [
+                  {
+                    "name": "Profile1",
+                    "capacity": {
+                      "minimum": "1",
+                      "maximum": "10",
+                      "default": "1"
+                    },
+                    "rules": [
+                      {
+                        "metricTrigger": {
+                          "metricName": "\\Processor\\PercentProcessorTime",
+                          "metricNamespace": "",
+                          "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+                          "timeGrain": "PT1M",
+                          "statistic": "Average",
+                          "timeWindow": "PT5M",
+                          "timeAggregation": "Average",
+                          "operator": "GreaterThan",
+                          "threshold": 60.0
+                        },
+                        "scaleAction": {
+                          "direction": "Increase",
+                          "type": "ChangeCount",
+                          "value": "1",
+                          "cooldown": "PT10M"
+                        }
+                      },
+                      {
+                        "metricTrigger": {
+                          "metricName": "\\Processor\\PercentProcessorTime",
+                          "metricNamespace": "",
+                          "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
+                          "timeGrain": "PT1M",
+                          "statistic": "Average",
+                          "timeWindow": "PT5M",
+                          "timeAggregation": "Average",
+                          "operator": "LessThan",
+                          "threshold": 40.0
+                        },
+                        "scaleAction": {
+                          "direction": "Decrease",
+                          "type": "ChangeCount",
+                          "value": "1",
+                          "cooldown": "PT10M"
+                        }
+                      }
+                    ]
+                  }
+                ]
+              }
             }
+          ],
+          "outputs": {
           }
         }
-      },
-      {
-        "type": "Microsoft.Insights/autoscaleSettings",
-        "apiVersion": "2015-04-01",
-        "name": "[concat(parameters('vmssName'),'autoscale')]",
-        "location": "[resourceGroup().location]",
-        "dependsOn": [
-          "[concat('Microsoft.Compute/virtualMachineScaleSets/', parameters('vmssName'))]"
-        ],
-        "properties": {
-          "name": "[concat(parameters('vmssName'),'autoscale')]",
-          "targetResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
-          "enabled": true,
-          "profiles": [
-            {
-              "name": "Profile1",
-              "capacity": {
-                "minimum": "1",
-                "maximum": "10",
-                "default": "1"
-              },
-              "rules": [
-                {
-                  "metricTrigger": {
-                    "metricName": "\\Processor\\PercentProcessorTime",
-                    "metricNamespace": "",
-                    "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/', resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
-                    "timeGrain": "PT1M",
-                    "statistic": "Average",
-                    "timeWindow": "PT5M",
-                    "timeAggregation": "Average",
-                    "operator": "GreaterThan",
-                    "threshold": 60.0
-                  },
-                  "scaleAction": {
-                    "direction": "Increase",
-                    "type": "ChangeCount",
-                    "value": "1",
-                    "cooldown": "PT10M"
-                  }
-                },
-                {
-                  "metricTrigger": {
-                    "metricName": "\\Processor\\PercentProcessorTime",
-                    "metricNamespace": "",
-                    "metricResourceUri": "[concat('/subscriptions/',subscription().subscriptionId, '/resourceGroups/',  resourceGroup().name, '/providers/Microsoft.Compute/virtualMachineScaleSets/', parameters('vmSSName'))]",
-                    "timeGrain": "PT1M",
-                    "statistic": "Average",
-                    "timeWindow": "PT5M",
-                    "timeAggregation": "Average",
-                    "operator": "LessThan",
-                    "threshold": 40.0
-                  },
-                  "scaleAction": {
-                    "direction": "Decrease",
-                    "type": "ChangeCount",
-                    "value": "1",
-                    "cooldown": "PT10M"
-                  }
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ],
-    "outputs": {
-    }
-  }
 
 -   Press on Save
 
@@ -320,13 +322,11 @@ The ssh endpoint of cluster master VM is \[USERNAME\]@\[DNSPREFIX\]mgmt.\[REGION
 
 -   Type commands and ensure all are done without errors:
 
-> *docker info*
->
-> *docker -H tcp://0.0.0.0:2375 info*
->
-> *docker run -i microsoft/azure-cli /bin/echo 'Hello world'*
->
-> *docker -H tcp://0.0.0.0:2375 run -i microsoft/azure-cli /bin/echo 'Hello world'*
+        docker info
+        docker -H tcp://0.0.0.0:2375 info
+        docker run -i microsoft/azure-cli /bin/echo 'Hello world'
+        docker -H tcp://0.0.0.0:2375 run -i microsoft/azure-cli /bin/echo 'Hello world'
+
 
 ###Create a new docker image
 
@@ -486,175 +486,124 @@ If you try several times you will get both success and error results. The runnin
 
 <img src="media/image24.png" width="290" height="154" />
 
-Configure Node.JS site
+####Configure Node.JS site
 
 -   Create an Express JS template project. You can use command line and exec the follow command:
 
-> *express &lt;app name&gt;*
->
+        express <app name>
+
 > Alternatively, you can use the Visual Studio and Node.js Tools for Visual Studio (<https://www.visualstudio.com/features/node-js-vs.aspx>). In the list of projects select *Other Languages -&gt; JavaScript -&gt; Node.js and create Basic Node.js Express 4 Application*.
 
 -   To connect to the azure storage service, install azure-storage module. You can use the command line and execute the follow command:
 
-*npm install azure-storage --save*
+	      npm install azure-storage --save
 
 Or in the Visual Studio you can use the Node.js Interactive Window and execute:
 
-*.npm \[&lt;app name&gt;\] install azure-storage –save*
+      	.npm [<app name>] install azure-storage –save
 
 -   The Docker is running on the Linux machine and ssh connection is required to connect and run the process. So ssh2 module needs to be installed as well. You can use the following command:
 
-*npm install ssh2 --save*
+	      npm install ssh2 --save
 
 or in the Visual Studio you can use the Node.js Interactive Window and execute:
 
-*.npm \[&lt;app name&gt;\] install ssh2 –save*
+	      .npm [<app name>] install ssh2 –save
 
 -   To identify users its id is stored in cookies. The sample uses node-uuid module for its generation. You can use the following command:
 
-*npm install node-uuid --save*
+	    npm install node-uuid --save
 
 or in the Visual Studio you can use the Node.js Interactive Window and execute:
 
-*.npm \[&lt;app name&gt;\] install node-uuid –save*
+	    .npm [<app name>] install node-uuid –save
 
 -   All config are stored in the JSON file. Create config.json and add the following configs:
 
-> *{*
->
-> *"storage": {*
->
-> *"accountName": "&lt;account name&gt;",*
->
-> *"secret": "&lt;secret&gt;",*
->
-> *"containerName": "&lt;container name&gt;",*
->
-> *"filePathTemplate": "https://%s.blob.core.windows.net/%s/%s"*
->
-> *},*
->
-> *"docker": {*
->
-> *"port":* 2375*,*
->
-> *"imageName": "&lt;DockerImageName&gt;" ,*
->
-> *"ssh": {*
->
-> *"host": "&lt;SwarmClusterMasterAddress&gt;",*
->
-> *"username": "azureuser",*
->
-> *"port": 2200 *
->
-> *"pathToPrivateKey": "&lt;local path to private key file id\_rsa.ppk&gt;"*
->
-> *},*
->
-> *"executeCommadTemplate": "docker -H tcp://0.0.0.0:%d run -t %s %s %s %s %s %s \`date +%s --date='next day'\`"*
->
-> *}*
->
-> *}*
+          {
+              "storage": {
+                "accountName": "<account name>",
+                "secret": "<secret>",
+                "containerName": "<container name>",
+                "filePathTemplate": "https://%s.blob.core.windows.net/%s/%s"
+              },
+              "docker": {
+                "port": 2375,
+                "imageName": "<DockerImageName>” ,
+                "ssh": {
+                  "host": "<SwarmClusterMasterAddress>",
+                  "username": "azureuser",
+                  "port": 2200 
+                  "pathToPrivateKey": "<local path to private key file id_rsa.ppk>"
+                },
+                "executeCommadTemplate": "docker -H tcp://0.0.0.0:%d run -t %s %s %s %s %s %s `date +%s --date='next day'`"
+              }
+            }
+
 
 -   For accountName and secret please use the storage account name and key we copied earlier after the storage account creation. In the Docker configuration section use the name of the published docker image we created for an imageName parameter. Ssh connection configuration is based on the cluster master address and the private key we used to connect to the cluster master earlier in the document.
 
 -   All modules and configuration file need to be included in app.js. Add the following code to the top of file:
 
-> *var uuid = require('node-uuid');*
->
-> *var file = require('fs');*
->
-> *var Client = require('ssh2').Client;*
->
-> *var azure = require('azure-storage');
-> *
+        var uuid = require('node-uuid');
+        var file = require('fs');
+        var Client = require('ssh2').Client;
+        var azure = require('azure-storage');
+
 
 and the following code after creation app:
 
-> *config = require('./config.json');*
->
-> *util = require('util');*
->
-> *Your file should be as:*
->
-> *&lt;some modules&gt;*
->
-> *var uuid = require('node-uuid');*
->
-> *var file = require('fs');*
->
-> *var Client = require('ssh2').Client;*
->
-> *var azure = require('azure-storage');*
->
-> *var app = express();*
->
-> *config = require('./config.json');*
->
-> *util = require('util');*
->
-> *&lt;code&gt;*
+    config = require('./config.json');
+    util = require('util');
+      Your file should be as:
+    <some modules>
+    var uuid = require('node-uuid');
+    var file = require('fs');
+    var Client = require('ssh2').Client;
+    var azure = require('azure-storage');
 
-*
-*
+    var app = express();
+
+    config = require('./config.json');
+    util = require('util');
+    <code>
+
+
 
 -   Add the following code to the app.js after the creation app to work Azure Storage:
 
-> *storageBlobService = azure.createBlobService(config.storage.accountName, config.storage.secret);*
+        storageBlobService = azure.createBlobService(config.storage.accountName, config.storage.secret);
 
 -   Also you should connect to the Docker machine via ssh. Add the following code after the creation app:
 
-> *startDocker = function(){*
->
-> *throw new Error();*
->
-> *};*
->
-> *var conn = new Client();*
->
-> *conn.on('ready', function() {*
->
-> *console.log('Client :: ready');*
->
-> *startDocker = function(fileUrl, processId) {*
->
-> *var command = util.format(config.docker.executeCommadTemplate, config.docker.port, config.docker.imageName, fileUrl, config.storage.accountName, config.storage.secret, config.storage.containerName, processId);*
->
-> *console.log(command);*
->
-> *conn.exec(command, function(err, stream) {*
->
-> *if (err) throw err;*
->
-> *stream.on('data', function(data) {*
->
-> *console.log('STDOUT: ' + data);*
->
-> *}).stderr.on('data', function(data) {*
->
-> *console.log('STDERR: ' + data);*
->
-> *});*
->
-> *});*
->
-> *}*
->
-> *}).connect({*
->
-> *host: config.docker.ssh.host,*
->
-> *port: config.docker.ssh.port,*
->
-> *username: config.docker.ssh.username,*
->
-> *privateKey: file.readFileSync(config.docker.ssh.pathToPrivateKey)*
->
-> *});*
->
-> startDocker is a function which takes original file Uri and the process ID. This function is used to start the Docker process*.*
+        startDocker = function(){
+          throw new Error();
+        };
+
+        var conn = new Client();
+        conn.on('ready', function() {
+          console.log('Client :: ready');
+          startDocker = function(fileUrl, processId) {
+            var command = util.format(config.docker.executeCommadTemplate, config.docker.port, config.docker.imageName, fileUrl, config.storage.accountName, config.storage.secret, config.storage.containerName, processId);
+            console.log(command);
+            conn.exec(command, function(err, stream) {
+              if (err) throw err;
+              stream.on('data', function(data) {
+                console.log('STDOUT: ' + data);
+              }).stderr.on('data', function(data) {
+                console.log('STDERR: ' + data);
+              });
+            });
+          }
+        }).connect({
+          host: config.docker.ssh.host,
+          port: config.docker.ssh.port,
+          username: config.docker.ssh.username,
+          privateKey: file.readFileSync(config.docker.ssh.pathToPrivateKey)
+        });
+
+
+startDocker is a function which takes original file Uri and the process ID. This function is used to start the Docker process*.*
 
 -   All methods will be in the index.js in the routes folder. Two methods are implemented:
 
@@ -662,188 +611,125 @@ and the following code after creation app:
 
 2.  The POST method should get the file Uri, run the Docker, and return the view to the user. The way of getting data to send to the user is the same in the both methods. It should identify the user by get list of blobs from the Azure storage.
 
-> The methods can be as following:
->
-> *function getIndexPage(req, res) {*
->
-> *// get user Id*
->
-> *var userId = req.cookies.id;*
->
-> *if (!userId) {*
->
-> *// if user doesn't have id then generate Id*
->
-> *userId = guidGenerator.v4().replace(/-/g, '');*
->
-> *res.cookie("id", userId);*
->
-> *}*
->
-> *storageBlobService.listBlobsSegmentedWithPrefix(config.storage.containerName, userId, null, function(error, result, response) {*
->
-> *if (!error) {*
->
-> *//getting all tasks*
->
-> *var allTasks = result.entries.map(function (blob) {*
->
-> *// build uri to download*
->
-> *var task = {blobSource: util.format(config.storage.filePathTemplate, config.storage.accountName, config.storage.containerName, blob.name)};*
->
-> *var firstPos = blob.name.indexOf('\_');*
->
-> *var secondPos = blob.name.indexOf('\_', firstPos + 1);*
->
-> *// getting task status*
->
-> *task.status = blob.name.substr(firstPos + 1, secondPos - firstPos - 1);*
->
-> *return task;*
->
-> *});*
->
-> *res.render('index', { title: 'Express' , processes: allTasks});*
->
-> *} else {*
->
-> *// if error then return empty page*
->
-> *console.log(error);*
->
-> *res.render('index', { title: 'Express' , processes: \[\] });*
->
-> *}*
->
-> *});*
->
-> *}*
+The methods can be as following:
+
+    function getIndexPage(req, res) {
+      // get user Id
+      var userId = req.cookies.id;
+
+      if (!userId) {
+        // if user doesn't have id then generate Id
+        userId = guidGenerator.v4().replace(/-/g, '');
+          res.cookie("id", userId);
+      }
+      storageBlobService.listBlobsSegmentedWithPrefix(config.storage.containerName, userId, null, function(error, result, response) {
+        if (!error) {
+          //getting all tasks
+          var allTasks = result.entries.map(function (blob) {
+            // build uri to download
+                var task = {blobSource: util.format(config.storage.filePathTemplate, config.storage.accountName, config.storage.containerName, blob.name)};
+            var firstPos = blob.name.indexOf('_');
+            var secondPos = blob.name.indexOf('_', firstPos + 1);
+            // getting task status
+            task.status = blob.name.substr(firstPos + 1, secondPos - firstPos - 1);
+              return task;
+          });
+          res.render('index', { title: 'Express' , processes: allTasks});
+        } else {
+          // if error then return empty page
+            console.log(error);
+          res.render('index', { title: 'Express' , processes: [] });
+        }
+      });
+    }
 
 -   Add the following route to handle GET request:
 
-> *router.get('/', function (req, res, next) {*
->
-> *getIndexPage(req, res);*
->
-> *});*
+        router.get('/', function (req, res, next) {
+          getIndexPage(req, res);
+        });
+
 
 -   The POST action should generate Docker process ID and start Docker. Its code is the following:
 
-> *router.post('/', function (req, res, next) {*
->
-> *// getting process Id*
->
-> *var processId = req.cookies.id + guidGenerator.v4().replace(/-/g, '');*
->
-> *// encode url*
->
-> *var fileUrl = encodeURI(req.body.fileUrl);*
->
-> *// execute sending command to docker via ssh*
->
-> *startDocker(fileUrl, processId);*
->
-> *getIndexPage(req, res);*
->
-> *});*
+        router.post('/', function (req, res, next) {
+          // getting process Id
+          var processId = req.cookies.id + guidGenerator.v4().replace(/-/g, '');
+          // encode url
+          var fileUrl = encodeURI(req.body.fileUrl);
+          // execute sending command to docker via ssh
+          startDocker(fileUrl, processId);
+          getIndexPage(req, res);
+        });
 
 -   The view should contain the textbox and the list of tasks. Add the following code to the index.jade in the views directory:
 
-> *extends layout*
->
-> *block content*
+        extends layout
+        block content
+          h1= title
+          p Welcome to #{title}
+          form(role='form'
+            method='post')
+            input(type='text'
+              placeholder='Paste file URL'
+              name='fileUrl')
+            input(type='submit'
+              value='Send')
+          - each process in processes
+            li
+              div
+                p
+                  span Task: 
+                  if process.status == 'Success'
+                    a(href='#{process.blobSource}') Download
+                  else
+                    span #{process.status}
 
-*h1= title*
-
-*p Welcome to \#{title}*
-
-*form(role='form'*
-
-*method='post')*
-
-*input(type='text'*
-
-*placeholder='Paste file URL'*
-
-*name='fileUrl')*
-
-*input(type='submit'*
-
-*value='Send')*
-
-*- each process in processes*
-
-*li*
-
-*div*
-
-*p*
-
-*span Task: *
-
-*if process.status == 'Success'*
-
-*a(href='\#{process.blobSource}') Download*
-
-*else*
-
-*span \#{process.status}*
 
 -   You can run web site (exact steps are specific for your environment and tools, for example you can open command line and start web site locally using the following commands to start Node.js server locally: *npm install* and *npm start* ). When brows address <http://localhost:3000>, select a file on the internet (we used Azure video tutorial as a sample) and send it for processing:
 
-> <img src="media/image25.png" width="247" height="239" />
+<img src="media/image25.png" width="247" height="239" />
 
 ###Deploy Node.JS as Azure Web App
 
 1.  Create a Wep App in Azure. Go to <https://portal.azure.com/>, click on "+New", select "Web + Mobile" and then "Web App":
 
-> <img src="media/image26.png" width="282" height="213" />
+<img src="media/image26.png" width="282" height="213" />
 
-1.  Enter application name, select Subscription, Resource Group and select or create app Service Plan/Location. Click Create.
+2.  Enter application name, select Subscription, Resource Group and select or create app Service Plan/Location. Click Create.
 
-> <img src="media/image27.png" width="156" height="262" />
+<img src="media/image27.png" width="156" height="262" />
 
-1.  To deploy your Node.JS app to the Azure Web App we can use a Local Git deployment model. Open the Web App you just created, click on the "All Settings" and select Deployment Source.
+3.  To deploy your Node.JS app to the Azure Web App we can use a Local Git deployment model. Open the Web App you just created, click on the "All Settings" and select Deployment Source.
 
-> <img src="media/image28.png" width="365" height="205" />
+<img src="media/image28.png" width="365" height="205" />
 
-1.  In the Deployment Source blade, click Choose Source, click Local Git Repository, and then click OK.
+4.  In the Deployment Source blade, click Choose Source, click Local Git Repository, and then click OK.
 
-> <img src="media/image29.png" width="268" height="155" />
->
-> 5. Set up deployment credentials if you haven't already done so. Open Web app blade, click All Settings, click Deployment credentials, fill a user name and password and then click Save.
->
-> <img src="media/image30.png" width="346" height="146" />
+img src="media/image29.png" width="268" height="155" />
 
-1.  In the Web app blade, click Settings, and then click Properties. To publish, you'll push to a remote Git repository. The URL for the repository is listed under GIT URL. You'll use this URL later.
+5. Set up deployment credentials if you haven't already done so. Open Web app blade, click All Settings, click Deployment credentials, fill a user name and password and then click Save.
 
-> <img src="media/image31.png" width="284" height="168" />
->
-> 7. To publish your project you should install Git.
->
-> 8. From the command line, change directories to the project directory and enter the following command to initialize a local Git repository.
->
-> *git init*
->
-> 9. Use the following commands to add files to the repository:
->
-> *git add .*
->
-> *git commit -m "initial commit"*
->
-> 10. Add a Git remote for pushing updates to the web app that you created previously, by using the following command:
->
-> *git remote add azure \[URL for remote repository\]*
->
-> 11. Push your changes to Azure by using the following command:
->
-> *git push azure master*
->
-> You are prompted for the password that you created earlier.
->
-> 12. To view your app, click the Browse button on the Web App part in the Azure portal.
->
+<img src="media/image30.png" width="346" height="146" />
+
+6.  In the Web app blade, click Settings, and then click Properties. To publish, you'll push to a remote Git repository. The URL for the repository is listed under GIT URL. You'll use this URL later.
+
+<img src="media/image31.png" width="284" height="168" />
+
+7.	To publish your project you should install Git.
+8.	From the command line, change directories to the project directory and enter the following command to initialize a local Git repository.
+    *git init*
+9.	Use the following commands to add files to the repository:
+     *git add .*
+     *git commit -m "initial commit"*
+10.	Add a Git remote for pushing updates to the web app that you created previously, by using the following command:
+     *git remote add azure [URL for remote repository]*
+11.	Push your changes to Azure by using the following command:
+     *git push azure master*
+You are prompted for the password that you created earlier.
+12.	To view your app, click the Browse button on the Web App part in the Azure portal. 
+
+
 > <img src="media/image32.png" width="265" height="93" />
 
 ##SUMMARY
