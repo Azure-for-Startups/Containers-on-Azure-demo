@@ -1,4 +1,8 @@
-##Abstract (May 2016)
+#Containers on Azure
+###Dockerized Encoder Example
+
+<br>
+##Abstract
 
 This sample covers a typical flow to perform heavy computational tasks (for example video or audio encoding, hash calculation, data encryption, etc.) and demonstrates how to make this process scalable and cost effective using Docker containers.
 
