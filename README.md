@@ -1,10 +1,10 @@
 #Containers on Azure
 ###Dockerized Encoder Example
 
-<br>
-##Abstract
+This tutorial covers a typical flow to perform heavy computational tasks (for example video or audio encoding, hash calculation, data encryption, etc.) and demonstrates how to make this process scalable and cost effective using Docker containers.  This article is also available in PDF format [here] (media/DockerizedEncoderSample.pdf).
 
-This sample covers a typical flow to perform heavy computational tasks (for example video or audio encoding, hash calculation, data encryption, etc.) and demonstrates how to make this process scalable and cost effective using Docker containers.
+Please feel free to fork the code base for your purpose and if you have any feedback on the demo code or documentation please log an [issue] (https://github.com/XynergiesLLC/Azure-IoT-demo/issues) and note what document or code base section the feedback is related to.
+
 
 ##INTRODUCTION
 
@@ -13,13 +13,11 @@ This demo scenario assumes the existence of a running service performing a heavy
 ####Components
 
 -   Worker Docker container performing heavy computational tasks
-
 -   Node.JS based website handling requests, showing completed tasks and initiating processing
 
 ####Flow
 
 -   The web site accepts the URL to the source blob and once the task has been completed it provides a temporary URL to download the results.
-
 -   The interaction between different components at a high level is displayed in the following sequence diagram:
 
 <img src="media/image1.png" width="410" height="285" />
@@ -35,11 +33,8 @@ The interface shows the user the list of tasks, status of each task, and allows 
 -   An Azure subscription
 
 -   <span id="OLE_LINK1" class="anchor"><span id="OLE_LINK2" class="anchor"><span id="OLE_LINK3" class="anchor"></span></span></span>Azure CLI (<https://azure.microsoft.com/en-us/documentation/articles/xplat-cli-install/>) or Azure Power Shell (<https://azure.microsoft.com/en-us/documentation/articles/powershell-install-configure/>) installed
-
 -   Active DockerHub account (sign up for free here: <https://www.docker.com/products/docker-hub>)
-
 -   Node.JS installed
-
 -   Optional: An existing SSH RSA Key if available. If not, follow the instructions in the document to create one.
 
 ####DURATION
@@ -297,7 +292,6 @@ or Azure PowerShell command:
 > <img src="media/image18.png" width="241" height="266" />
 
 -   Select resource group, accept legal terms and press Create
-
 -   When deployment has been finished open the Resource Explorer and enter "autoscale" in the search box. Ensure you see an item in your resource group like this:
 
 > <img src="media/image19.png" width="342" height="164" />
@@ -319,7 +313,6 @@ The ssh endpoint of cluster master VM is \[USERNAME\]@\[DNSPREFIX\]mgmt.\[REGION
 > <img src="media/image22.png" width="376" height="228" />
 
 -   Initiate a console ssh session to master VM.
-
 -   Type commands and ensure all are done without errors:
 
         docker info
@@ -333,14 +326,12 @@ The ssh endpoint of cluster master VM is \[USERNAME\]@\[DNSPREFIX\]mgmt.\[REGION
 We will create an image for our dockerized encoder from scratch. This image will be a dummy encoder. It downloads a file, makes a high CPU load for 1 processor core for 120 seconds and then copies the file to storage or creates an error (tuned to be in 20% of runs). Also the script removes expired results. This is not a production script sample. Be sure you have an active account on the docker hub. Read more details and signup here: <https://www.docker.com/products/docker-hub>. In order to avoid local docker installation I propose to use the master virtual machine of cluster just created.
 
 -   Initiate a console ssh session to cluster master VM.
-
 -   Type commands:
 
         cd
         mkdir dockerizedencoder
         cd dockerizedencoder
         vi Dockerfile
-
 
 -   Press Insert and paste the following content:
 
@@ -358,7 +349,6 @@ We will create an image for our dockerized encoder from scratch. This image will
 
 
 -   Save file, press Esc, Shift + ‘:’, type wq and press Enter)
-
 -   Type a command:
 
         vi docker-entrypoint.sh
@@ -445,13 +435,11 @@ We will create an image for our dockerized encoder from scratch. This image will
         result "$(((RANDOM % 100)+1)) -lt 20"
 
 -   Save file
-
 -   Type command:
 
         docker login
 
 -   Enter your credentials for docker hub
-
 -   In order to publish a new image in the docker hub we need a unique name for image. Let us use a YourDockerHubLogin/dockerizedencoder as the name. Do not forget to replace YourDockerHubLogin with your docker hub login for this and subsequent commands. Type command:
 
         docker build -t YourDockerHubLogin/dockerizedencoder ./
@@ -505,7 +493,6 @@ Or in the Visual Studio you can use the Node.js Interactive Window and execute:
 -   The Docker is running on the Linux machine and ssh connection is required to connect and run the process. So ssh2 module needs to be installed as well. You can use the following command:
 
 	      npm install ssh2 --save
-
 or in the Visual Studio you can use the Node.js Interactive Window and execute:
 
 	      .npm [<app name>] install ssh2 –save
@@ -513,7 +500,6 @@ or in the Visual Studio you can use the Node.js Interactive Window and execute:
 -   To identify users its id is stored in cookies. The sample uses node-uuid module for its generation. You can use the following command:
 
 	    npm install node-uuid --save
-
 or in the Visual Studio you can use the Node.js Interactive Window and execute:
 
 	    .npm [<app name>] install node-uuid –save
@@ -542,7 +528,6 @@ or in the Visual Studio you can use the Node.js Interactive Window and execute:
 
 
 -   For accountName and secret please use the storage account name and key we copied earlier after the storage account creation. In the Docker configuration section use the name of the published docker image we created for an imageName parameter. Ssh connection configuration is based on the cluster master address and the private key we used to connect to the cluster master earlier in the document.
-
 -   All modules and configuration file need to be included in app.js. Add the following code to the top of file:
 
         var uuid = require('node-uuid');
@@ -606,9 +591,7 @@ and the following code after creation app:
 startDocker is a function which takes original file Uri and the process ID. This function is used to start the Docker process*.*
 
 -   All methods will be in the index.js in the routes folder. Two methods are implemented:
-
 1.  The GET method returns the view where the user can view list of tasks and text box to provide Uri and send it to the server.
-
 2.  The POST method should get the file Uri, run the Docker, and return the view to the user. The way of getting data to send to the user is the same in the both methods. It should identify the user by get list of blobs from the Azure storage.
 
 The methods can be as following:
@@ -692,43 +675,43 @@ The methods can be as following:
 
 ###Deploy Node.JS as Azure Web App
 
-1.  Create a Wep App in Azure. Go to <https://portal.azure.com/>, click on "+New", select "Web + Mobile" and then "Web App":
+1. Create a Wep App in Azure. Go to <https://portal.azure.com/>, click on "+New", select "Web + Mobile" and then "Web App":
 
 <img src="media/image26.png" width="282" height="213" />
 
-2.  Enter application name, select Subscription, Resource Group and select or create app Service Plan/Location. Click Create.
+2. Enter application name, select Subscription, Resource Group and select or create app Service Plan/Location. Click Create.
 
 <img src="media/image27.png" width="156" height="262" />
 
-3.  To deploy your Node.JS app to the Azure Web App we can use a Local Git deployment model. Open the Web App you just created, click on the "All Settings" and select Deployment Source.
+3. To deploy your Node.JS app to the Azure Web App we can use a Local Git deployment model. Open the Web App you just created, click on the "All Settings" and select Deployment Source.
 
 <img src="media/image28.png" width="365" height="205" />
 
-4.  In the Deployment Source blade, click Choose Source, click Local Git Repository, and then click OK.
+4. In the Deployment Source blade, click Choose Source, click Local Git Repository, and then click OK.
 
-img src="media/image29.png" width="268" height="155" />
+<img src="media/image29.png" width="268" height="155" />
 
 5. Set up deployment credentials if you haven't already done so. Open Web app blade, click All Settings, click Deployment credentials, fill a user name and password and then click Save.
 
 <img src="media/image30.png" width="346" height="146" />
 
-6.  In the Web app blade, click Settings, and then click Properties. To publish, you'll push to a remote Git repository. The URL for the repository is listed under GIT URL. You'll use this URL later.
+6. In the Web app blade, click Settings, and then click Properties. To publish, you'll push to a remote Git repository. The URL for the repository is listed under GIT URL. You'll use this URL later.
 
 <img src="media/image31.png" width="284" height="168" />
 
-7.	To publish your project you should install Git.
-8.	From the command line, change directories to the project directory and enter the following command to initialize a local Git repository.
+7. To publish your project you should install Git.
+8. From the command line, change directories to the project directory and enter the following command to initialize a local Git repository.
     *git init*
-9.	Use the following commands to add files to the repository:
+9. Use the following commands to add files to the repository:
      *git add .*
      *git commit -m "initial commit"*
-10.	Add a Git remote for pushing updates to the web app that you created previously, by using the following command:
+10. Add a Git remote for pushing updates to the web app that you created previously, by using the following command:
      *git remote add azure [URL for remote repository]*
-11.	Push your changes to Azure by using the following command:
+11. Push your changes to Azure by using the following command:
      *git push azure master*
-You are prompted for the password that you created earlier.
-12.	To view your app, click the Browse button on the Web App part in the Azure portal. 
 
+   You are prompted for the password that you created earlier.
+12. To view your app, click the Browse button on the Web App part in the Azure portal. 
 
 > <img src="media/image32.png" width="265" height="93" />
 
