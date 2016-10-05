@@ -675,45 +675,45 @@ The methods can be as following:
 
 ###Deploy Node.JS as Azure Web App
 
-1. Create a Wep App in Azure. Go to <https://portal.azure.com/>, click on "+New", select "Web + Mobile" and then "Web App":
+1\. Create a Wep App in Azure. Go to <https://portal.azure.com/>, click on "+New", select "Web + Mobile" and then "Web App":
 
 <img src="media/image26.png" width="282" height="213" />
 
-2. Enter application name, select Subscription, Resource Group and select or create app Service Plan/Location. Click Create.
+2\. Enter application name, select Subscription, Resource Group and select or create app Service Plan/Location. Click Create.
 
 <img src="media/image27.png" width="156" height="262" />
 
-3. To deploy your Node.JS app to the Azure Web App we can use a Local Git deployment model. Open the Web App you just created, click on the "All Settings" and select Deployment Source.
+3\. To deploy your Node.JS app to the Azure Web App we can use a Local Git deployment model. Open the Web App you just created, click on the "All Settings" and select Deployment Source.
 
 <img src="media/image28.png" width="365" height="205" />
 
-4. In the Deployment Source blade, click Choose Source, click Local Git Repository, and then click OK.
+4\. In the Deployment Source blade, click Choose Source, click Local Git Repository, and then click OK.
 
 <img src="media/image29.png" width="268" height="155" />
 
-5. Set up deployment credentials if you haven't already done so. Open Web app blade, click All Settings, click Deployment credentials, fill a user name and password and then click Save.
+5\. Set up deployment credentials if you haven't already done so. Open Web app blade, click All Settings, click Deployment credentials, fill a user name and password and then click Save.
 
 <img src="media/image30.png" width="346" height="146" />
 
-6. In the Web app blade, click Settings, and then click Properties. To publish, you'll push to a remote Git repository. The URL for the repository is listed under GIT URL. You'll use this URL later.
+6\. In the Web app blade, click Settings, and then click Properties. To publish, you'll push to a remote Git repository. The URL for the repository is listed under GIT URL. You'll use this URL later.
 
 <img src="media/image31.png" width="284" height="168" />
 
-7. To publish your project you should install Git.
-8. From the command line, change directories to the project directory and enter the following command to initialize a local Git repository.
+7\. To publish your project you should install Git.
+8\. From the command line, change directories to the project directory and enter the following command to initialize a local Git repository.
     *git init*
-9. Use the following commands to add files to the repository:
+9\. Use the following commands to add files to the repository:
      *git add .*
      *git commit -m "initial commit"*
-10. Add a Git remote for pushing updates to the web app that you created previously, by using the following command:
+10\. Add a Git remote for pushing updates to the web app that you created previously, by using the following command:
      *git remote add azure [URL for remote repository]*
-11. Push your changes to Azure by using the following command:
+11\. Push your changes to Azure by using the following command:
      *git push azure master*
 
    You are prompted for the password that you created earlier.
-12. To view your app, click the Browse button on the Web App part in the Azure portal. 
+12\. To view your app, click the Browse button on the Web App part in the Azure portal. 
 
-> <img src="media/image32.png" width="265" height="93" />
+<img src="media/image32.png" width="265" height="93" />
 
 ##SUMMARY
 
