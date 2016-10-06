@@ -3,7 +3,7 @@
 
 This tutorial covers a typical flow to perform heavy computational tasks (for example video or audio encoding, hash calculation, data encryption, etc.) and demonstrates how to make this process scalable and cost effective using Docker containers.  This article is also available in PDF format [here] (media/DockerizedEncoderSample.pdf).
 
-Please feel free to fork the code base for your purpose and if you have any feedback on the demo code or documentation please log an [issue] (https://github.com/XynergiesLLC/Azure-IoT-demo/issues) and note what document or code base section the feedback is related to.
+Please feel free to fork the code base for your purpose and if you have any feedback on the demo code or documentation please log an [issue] (https://github.com/Azure-for-Startups/Azure-IoT-demo/issues) and note what document or code base section the feedback is related to.
 
 
 ##INTRODUCTION
