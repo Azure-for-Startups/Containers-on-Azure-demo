@@ -7,7 +7,7 @@ Feel free to fork the code base for your purpose.  If you have any feedback on t
 
 Related information:
 
-[Manage your microservices and containers with CoScale in real-time] (https://channel9.msdn.com/Events/Journey-to-the-Websummit--Online-Masterclasses/Achieving-Start-up-Velocity-with-Serverless-Architectures--Gonalo-Ruiz-Microsoft-Startup-Accelerator) - a video of the Websummit webcast event from Nov 3, 2016.
+[Manage your microservices and containers with CoScale in real-time] (https://channel9.msdn.com/Events/Journey-to-the-Websummit--Online-Masterclasses/Achieving-Start-up-Velocity-with-Serverless-Architectures--Gonalo-Ruiz-Microsoft-Startup-Accelerator) - a Websummit webcast video showing you how with CoScale, you can understand and stay in control of your infrastructure, containers, applications and key business metrics.
 
 
 ##INTRODUCTION
