@@ -3,7 +3,11 @@
 
 This tutorial covers a typical flow to perform heavy computational tasks (for example video or audio encoding, hash calculation, data encryption, etc.) and demonstrates how to make this process scalable and cost effective using Docker containers.  This article is also available in PDF format [here] (media/DockerizedEncoderSample.pdf).
 
-Please feel free to fork the code base for your purpose and if you have any feedback on the demo code or documentation please log an [issue] (https://github.com/Azure-for-Startups/Containers-on-Dockers-demo/issues) and note what document or code base section the feedback is related to.
+Feel free to fork the code base for your purpose.  If you have any feedback on the demo code or documentation please log an [issue] (https://github.com/Azure-for-Startups/Containers-on-Dockers-demo/issues) and note what document or code base section the feedback is related to.
+
+Related information:
+
+[Manage your microservices and containers with CoScale in real-time] (https://channel9.msdn.com/Events/Journey-to-the-Websummit--Online-Masterclasses/Achieving-Start-up-Velocity-with-Serverless-Architectures--Gonalo-Ruiz-Microsoft-Startup-Accelerator) - a video of the Websummit webcast event from Nov 3, 2016.
 
 
 ##INTRODUCTION
